@@ -32,6 +32,31 @@ app.post('/agregar-transaccion', async (req, res) => {
   }
 });
 
+
+app.post('/cantidad-transacciones-en-fecha', async (req, res) => {
+  try {
+    const { fecha } = req.body;
+    
+    if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+      return res.status(400).json({ error: 'Fecha no válida. Utiliza el formato "YYYY-MM-DD".' });
+    }
+
+    const fechaInicio = new Date(fecha);
+    fechaInicio.setHours(0, 0, 0, 0);
+    const fechaFin = new Date(fecha);
+    fechaFin.setHours(23, 59, 59, 999);
+
+    const cantidadTransacciones = await Transaccion.countDocuments({
+      fecha: { $gte: fechaInicio, $lte: fechaFin }
+    });
+
+    res.json({ fecha, cantidadTransacciones });
+  } catch (error) {
+    console.error('Error al consultar la cantidad de transacciones:', error);
+    res.status(500).json({ error: 'Error al consultar la cantidad de transacciones' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
 });
