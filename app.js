@@ -99,13 +99,6 @@ app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
     res.status(500).json({ error: 'Error al consultar la sumatoria de transacciones' });
   }
 });
-    const resultado = await Transaccion.aggregate(pipeline);
-    res.json(resultado);
-  } catch (error) {
-    console.error('Error al consultar la sumatoria de transacciones:', error);
-    res.status(500).json({ error: 'Error al consultar la sumatoria de transacciones' });
-  }
-});
 
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
