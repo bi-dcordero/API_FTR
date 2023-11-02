@@ -57,7 +57,7 @@ app.post('/cantidad-transacciones-en-fecha', async (req, res) => {
   }
 });
 
-app.post('/total-transacciones-en-rango', async (req, res) => {
+app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
   try {
     const { fechaInicio, fechaFin } = req.body;
     
@@ -65,19 +65,31 @@ app.post('/total-transacciones-en-rango', async (req, res) => {
       return res.status(400).json({ error: 'Fechas no válidas. Utiliza el formato "YYYY-MM-DD".' });
     }
 
-    const fechaInicioObj = new Date(fechaInicio);
-    fechaInicioObj.setHours(0, 0, 0, 0);
-    const fechaFinObj = new Date(fechaFin);
-    fechaFinObj.setHours(23, 59, 59, 999);
+    const pipeline = [
+      {
+        $match: {
+          fecha: {
+            $gte: new Date(fechaInicio + "T00:00:00Z"),
+            $lte: new Date(fechaFin + "T23:59:59.999Z")
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
+          totalTransacciones: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ];
 
-    const totalTransacciones = await Transaccion.countDocuments({
-      fecha: { $gte: fechaInicioObj, $lte: fechaFinObj }
-    });
-
-    res.json({ fechaInicio, fechaFin, totalTransacciones });
+    const resultado = await Transaccion.aggregate(pipeline);
+    res.json(resultado);
   } catch (error) {
-    console.error('Error al consultar el total de transacciones:', error);
-    res.status(500).json({ error: 'Error al consultar el total de transacciones' });
+    console.error('Error al consultar la sumatoria de transacciones:', error);
+    res.status(500).json({ error: 'Error al consultar la sumatoria de transacciones' });
   }
 });
 
