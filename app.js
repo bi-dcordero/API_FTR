@@ -76,12 +76,12 @@ app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
+          fecha: { $dateToString: { format: "%Y-%m-%d", date: "$fecha" } },
           totalTransacciones: { $sum: 1 }
         }
       },
       {
-        $sort: { fecha: 1 }
+        $sort: { _id: 1 }
       }
     ];
 
