@@ -81,7 +81,7 @@ app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
         }
       },
       {
-        $sort: { _id: 1 }
+        $sort: { fecha: 1 }
       }
     ];
 
