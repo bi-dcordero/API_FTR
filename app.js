@@ -4,7 +4,7 @@ const Transaccion = require('./models/transaccion');
 const db = require('./db');
 
 const app = express();
-const port = 80;
+const port = process.env.PORT || 80;
 
 app.use(bodyParser.json());
 
