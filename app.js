@@ -57,6 +57,30 @@ app.post('/cantidad-transacciones-en-fecha', async (req, res) => {
   }
 });
 
+app.post('/total-transacciones-en-rango', async (req, res) => {
+  try {
+    const { fechaInicio, fechaFin } = req.body;
+    
+    if (!fechaInicio || !fechaFin || !/^\d{4}-\d{2}-\d{2}$/.test(fechaInicio) || !/^\d{4}-\d{2}-\d{2}$/.test(fechaFin)) {
+      return res.status(400).json({ error: 'Fechas no válidas. Utiliza el formato "YYYY-MM-DD".' });
+    }
+
+    const fechaInicioObj = new Date(fechaInicio);
+    fechaInicioObj.setHours(0, 0, 0, 0);
+    const fechaFinObj = new Date(fechaFin);
+    fechaFinObj.setHours(23, 59, 59, 999);
+
+    const totalTransacciones = await Transaccion.countDocuments({
+      fecha: { $gte: fechaInicioObj, $lte: fechaFinObj }
+    });
+
+    res.json({ fechaInicio, fechaFin, totalTransacciones });
+  } catch (error) {
+    console.error('Error al consultar el total de transacciones:', error);
+    res.status(500).json({ error: 'Error al consultar el total de transacciones' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
 });
