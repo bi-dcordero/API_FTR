@@ -82,9 +82,23 @@ app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
       },
       {
         $sort: { _id: 1 }
+      },
+      {
+        $project: {
+          fecha: '$_id',
+          totalTransacciones: 1,
+          _id: 0
+        }
       }
     ];
 
+    const resultado = await Transaccion.aggregate(pipeline);
+    res.json(resultado);
+  } catch (error) {
+    console.error('Error al consultar la sumatoria de transacciones:', error);
+    res.status(500).json({ error: 'Error al consultar la sumatoria de transacciones' });
+  }
+});
     const resultado = await Transaccion.aggregate(pipeline);
     res.json(resultado);
   } catch (error) {
