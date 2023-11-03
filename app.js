@@ -9,7 +9,7 @@ const app = express();
 const port = process.env.PORT || 80;
 app.use(bodyParser.json());
 const corsOptions = {
-  origin: 'https://tudominioenreact.com', // Reemplaza esto con el dominio de tu aplicación React
+  origin: 'https://rosa-uwur.github.io', // Reemplaza esto con el dominio de tu aplicación React
 };
 
 app.use(cors(corsOptions));
