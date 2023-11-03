@@ -124,13 +124,15 @@ app.post('/sumatoria-transacciones-por-moneda', async (req, res) => {
       {
         $group: {
           _id: "$moneda",
-          totalTransacciones: { $sum: 1 }
+          totalTransacciones: { $sum: 1 },
+          totalMonto: { $sum: "$monto" }
         }
       },
       {
         $project: {
           moneda: '$_id',
           totalTransacciones: 1,
+          totalMonto: 1,
           _id: 0
         }
       }
@@ -143,6 +145,7 @@ app.post('/sumatoria-transacciones-por-moneda', async (req, res) => {
     res.status(500).json({ error: 'Error al consultar la sumatoria de transacciones por moneda' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
