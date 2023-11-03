@@ -2,11 +2,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Transaccion = require('./models/transaccion');
 const db = require('./db');
+const cors = require('cors');
+
 
 const app = express();
 const port = process.env.PORT || 80;
-
 app.use(bodyParser.json());
+const corsOptions = {
+  origin: 'https://tudominioenreact.com', // Reemplaza esto con el dominio de tu aplicación React
+};
+
+app.use(cors(corsOptions));
 
 // Ruta para consultar todas las transacciones
 app.get('/todas-las-transacciones', async (req, res) => {
