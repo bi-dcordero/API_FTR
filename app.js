@@ -101,8 +101,6 @@ app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
 });
 
 
-
-// Ruta para agrupar transacciones por moneda y calcular la suma de elementos para una fecha específica
 app.post('/sumatoria-transacciones-por-moneda', async (req, res) => {
   try {
     const { fecha } = req.body;
@@ -127,6 +125,13 @@ app.post('/sumatoria-transacciones-por-moneda', async (req, res) => {
         $group: {
           _id: "$moneda",
           totalTransacciones: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          moneda: '$_id',
+          totalTransacciones: 1,
+          _id: 0
         }
       }
     ];
