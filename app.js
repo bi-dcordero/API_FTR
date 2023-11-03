@@ -100,6 +100,45 @@ app.post('/sumatoria-transacciones-por-dia', async (req, res) => {
   }
 });
 
+
+
+// Ruta para agrupar transacciones por moneda y calcular la suma de elementos para una fecha específica
+app.post('/sumatoria-transacciones-por-moneda', async (req, res) => {
+  try {
+    const { fecha } = req.body;
+
+    if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+      return res.status(400).json({ error: 'Fecha no válida. Utiliza el formato "YYYY-MM-DD".' });
+    }
+
+    const fechaInicio = new Date(fecha + "T00:00:00Z");
+    const fechaFin = new Date(fecha + "T23:59:59.999Z");
+
+    const pipeline = [
+      {
+        $match: {
+          fecha: {
+            $gte: fechaInicio,
+            $lte: fechaFin
+          }
+        }
+      },
+      {
+        $group: {
+          _id: "$moneda",
+          totalTransacciones: { $sum: 1 }
+        }
+      }
+    ];
+
+    const resultado = await Transaccion.aggregate(pipeline);
+    res.json(resultado);
+  } catch (error) {
+    console.error('Error al consultar la sumatoria de transacciones por moneda:', error);
+    res.status(500).json({ error: 'Error al consultar la sumatoria de transacciones por moneda' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`API escuchando en el puerto ${port}`);
 });
